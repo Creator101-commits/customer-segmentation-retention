@@ -1,0 +1,338 @@
+{
+  "baseline_reference": {
+    "roc_auc": 0.8421,
+    "f1": 0.6185,
+    "accuracy": 0.73,
+    "precision": 0.5,
+    "recall": 0.82
+  },
+  "optuna_trials": 80,
+  "calibration_method": "isotonic",
+  "calibration_cv": 3,
+  "cost_settings": {
+    "cost_fn": 200,
+    "cost_fp": 20
+  },
+  "recall_constraint": 0.8,
+  "best_optuna_params": {
+    "n_estimators": 612,
+    "max_depth": 5,
+    "learning_rate": 0.01556630154491733,
+    "subsample": 0.6327154593962145,
+    "colsample_bytree": 0.6771222449157833,
+    "min_child_weight": 5,
+    "gamma": 3.6716762167037986,
+    "reg_alpha": 0.829786480486168,
+    "reg_lambda": 6.127170643782226,
+    "scale_pos_weight": 1.3663980359233747
+  },
+  "best_optuna_cv_auc": 0.8510142768064656,
+  "selected_final_model": "calibrated_xgb",
+  "top_20_feature_importance": [
+    {
+      "feature": "mtm_high_charge",
+      "importance": 0.1508139967918396
+    },
+    {
+      "feature": "early_mtm",
+      "importance": 0.12856309115886688
+    },
+    {
+      "feature": "charges_per_tenure",
+      "importance": 0.08208303898572922
+    },
+    {
+      "feature": "fiber_no_security",
+      "importance": 0.06829437613487244
+    },
+    {
+      "feature": "Contract_Two_year",
+      "importance": 0.051408831030130386
+    },
+    {
+      "feature": "digital_risk",
+      "importance": 0.03143703192472458
+    },
+    {
+      "feature": "InternetService_Fiber_optic",
+      "importance": 0.030731014907360077
+    },
+    {
+      "feature": "Contract_One_year",
+      "importance": 0.030169324949383736
+    },
+    {
+      "feature": "OnlineBackup_No_internet_service",
+      "importance": 0.026838533580303192
+    },
+    {
+      "feature": "DeviceProtection_No_internet_service",
+      "importance": 0.026223070919513702
+    },
+    {
+      "feature": "PaymentMethod_Electronic_check",
+      "importance": 0.0253090001642704
+    },
+    {
+      "feature": "OnlineSecurity_No_internet_service",
+      "importance": 0.025088444352149963
+    },
+    {
+      "feature": "tenure",
+      "importance": 0.023680947721004486
+    },
+    {
+      "feature": "InternetService_No",
+      "importance": 0.02045992761850357
+    },
+    {
+      "feature": "PaperlessBilling_Yes",
+      "importance": 0.016986973583698273
+    },
+    {
+      "feature": "StreamingMovies_Yes",
+      "importance": 0.016706684604287148
+    },
+    {
+      "feature": "log_total",
+      "importance": 0.014079250395298004
+    },
+    {
+      "feature": "StreamingTV_Yes",
+      "importance": 0.013062556274235249
+    },
+    {
+      "feature": "log_monthly",
+      "importance": 0.012997944839298725
+    },
+    {
+      "feature": "MultipleLines_No_phone_service",
+      "importance": 0.012922558933496475
+    }
+  ],
+  "engineered_features": [
+    "charges_per_tenure",
+    "spend_gap",
+    "service_count",
+    "service_density",
+    "mtm_high_charge",
+    "tenure_bucket",
+    "no_protection",
+    "digital_risk",
+    "log_monthly",
+    "log_total",
+    "fiber_no_security",
+    "early_mtm",
+    "tenure_x_contract"
+  ],
+  "engineered_features_in_top_20": [
+    "charges_per_tenure",
+    "mtm_high_charge",
+    "digital_risk",
+    "log_monthly",
+    "log_total",
+    "fiber_no_security",
+    "early_mtm"
+  ],
+  "lgbm_top_20_feature_importance": [
+    {
+      "feature": "spend_gap",
+      "importance": 2631.0
+    },
+    {
+      "feature": "MonthlyCharges",
+      "importance": 2243.0
+    },
+    {
+      "feature": "charges_per_tenure",
+      "importance": 2166.0
+    },
+    {
+      "feature": "TotalCharges",
+      "importance": 2041.0
+    },
+    {
+      "feature": "tenure",
+      "importance": 1107.0
+    },
+    {
+      "feature": "log_monthly",
+      "importance": 500.0
+    },
+    {
+      "feature": "log_total",
+      "importance": 379.0
+    },
+    {
+      "feature": "gender_Male",
+      "importance": 332.0
+    },
+    {
+      "feature": "service_count",
+      "importance": 327.0
+    },
+    {
+      "feature": "PaymentMethod_Electronic_check",
+      "importance": 231.0
+    },
+    {
+      "feature": "OnlineBackup_Yes",
+      "importance": 216.0
+    },
+    {
+      "feature": "PaperlessBilling_Yes",
+      "importance": 206.0
+    },
+    {
+      "feature": "digital_risk",
+      "importance": 204.0
+    },
+    {
+      "feature": "Partner_Yes",
+      "importance": 200.0
+    },
+    {
+      "feature": "Dependents_Yes",
+      "importance": 198.0
+    },
+    {
+      "feature": "SeniorCitizen",
+      "importance": 168.0
+    },
+    {
+      "feature": "OnlineSecurity_Yes",
+      "importance": 160.0
+    },
+    {
+      "feature": "PaymentMethod_Mailed_check",
+      "importance": 157.0
+    },
+    {
+      "feature": "MultipleLines_Yes",
+      "importance": 153.0
+    },
+    {
+      "feature": "TechSupport_Yes",
+      "importance": 151.0
+    }
+  ],
+  "lgbm_engineered_features_in_top_20": [
+    "charges_per_tenure",
+    "spend_gap",
+    "service_count",
+    "digital_risk",
+    "log_monthly",
+    "log_total"
+  ],
+  "model_comparison": {
+    "xgb_recall_constrained_roc_auc": 0.8421631611370235,
+    "lgbm_recall_constrained_roc_auc": 0.8194850676343758
+  },
+  "results": [
+    {
+      "threshold": 0.5,
+      "roc_auc": 0.8071747311967117,
+      "precision": 0.5590778097982709,
+      "recall": 0.5187165775401069,
+      "f1": 0.5381414701803051,
+      "accuracy": 0.7633262260127932,
+      "all_non_auc_better": false,
+      "all_better": false,
+      "name": "feature_engineered_baseline_xgb"
+    },
+    {
+      "threshold": 0.5,
+      "roc_auc": 0.8421631611370235,
+      "precision": 0.6366459627329193,
+      "recall": 0.5481283422459893,
+      "f1": 0.5890804597701149,
+      "accuracy": 0.7967306325515281,
+      "all_non_auc_better": false,
+      "all_better": false,
+      "name": "calibrated_xgb_threshold_0_50"
+    },
+    {
+      "threshold": 0.2799999999999999,
+      "roc_auc": 0.8421631611370235,
+      "precision": 0.5067340067340067,
+      "recall": 0.8048128342245989,
+      "f1": 0.621900826446281,
+      "accuracy": 0.7398720682302772,
+      "min_recall_constraint": 0.8,
+      "all_non_auc_better": false,
+      "all_better": false,
+      "name": "calibrated_xgb_recall_constrained_threshold"
+    },
+    {
+      "threshold": 0.11,
+      "roc_auc": 0.8421631611370235,
+      "precision": 0.3899233296823658,
+      "recall": 0.9518716577540107,
+      "f1": 0.5532245532245532,
+      "accuracy": 0.5913290689410092,
+      "fp": 557,
+      "fn": 18,
+      "business_cost": 14740.0,
+      "cost_fn": 200,
+      "cost_fp": 20,
+      "all_non_auc_better": false,
+      "all_better": false,
+      "name": "calibrated_xgb_cost_optimized_threshold"
+    },
+    {
+      "threshold": 0.5,
+      "roc_auc": 0.8194850676343758,
+      "precision": 0.6014234875444839,
+      "recall": 0.45187165775401067,
+      "f1": 0.516030534351145,
+      "accuracy": 0.7746979388770433,
+      "all_non_auc_better": false,
+      "all_better": false,
+      "name": "calibrated_lgbm_threshold_0_50"
+    },
+    {
+      "threshold": 0.2599999999999999,
+      "roc_auc": 0.8194850676343758,
+      "precision": 0.4747634069400631,
+      "recall": 0.8048128342245989,
+      "f1": 0.5972222222222222,
+      "accuracy": 0.7114427860696517,
+      "min_recall_constraint": 0.8,
+      "all_non_auc_better": false,
+      "all_better": false,
+      "name": "calibrated_lgbm_recall_constrained_threshold"
+    },
+    {
+      "threshold": 0.12,
+      "roc_auc": 0.8194850676343758,
+      "precision": 0.3893805309734513,
+      "recall": 0.9411764705882353,
+      "f1": 0.5508607198748043,
+      "accuracy": 0.5920398009950248,
+      "fp": 552,
+      "fn": 22,
+      "business_cost": 15440.0,
+      "cost_fn": 200,
+      "cost_fp": 20,
+      "all_non_auc_better": false,
+      "all_better": false,
+      "name": "calibrated_lgbm_cost_optimized_threshold"
+    }
+  ],
+  "recommended_operating_point": {
+    "threshold": 0.2799999999999999,
+    "roc_auc": 0.8421631611370235,
+    "precision": 0.5067340067340067,
+    "recall": 0.8048128342245989,
+    "f1": 0.621900826446281,
+    "accuracy": 0.7398720682302772,
+    "min_recall_constraint": 0.8,
+    "all_non_auc_better": false,
+    "all_better": false,
+    "name": "calibrated_xgb_recall_constrained_threshold"
+  },
+  "notes": [
+    "Use recall-constrained threshold as primary campaign operating point.",
+    "Do not deploy cost-optimized threshold blindly if precision is too low."
+  ]
+}

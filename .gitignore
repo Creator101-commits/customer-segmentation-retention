@@ -15,6 +15,5 @@ venv/
 .DS_Store
 
 # Generated artifacts
-Results/
 catboost_info/
 prob_distribution.png
