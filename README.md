@@ -63,8 +63,8 @@ Run the complete local workflow:
 
 ```sh
 source .venv/bin/activate
-python model_search_ensemble.py
-python generate_result_graphs.py
+python PythonCode/model_search_ensemble.py
+python PythonCode/generate_result_graphs.py
 ```
 
 Optional quick verification:
