@@ -1,0 +1,53 @@
+CUSTOMER SEGMENTATION & RETENTION STRATEGY
+===========================================
+
+FINAL MODEL OPERATING POINT
+- Selected model: Calibrated XGBoost (isotonic calibration, cv=3)
+- Campaign threshold: 0.28 (recall-constrained operating point)
+- ROC-AUC: 0.8422
+- Precision: 0.5067
+- Recall: 0.8048
+- F1 (churn class): 0.6219
+- Accuracy: 0.7399
+
+SEGMENT ACTION PLAN (EXACT COUNTS, CHURN RATES, THRESHOLD, COST MAPPING)
+
+1) Champion (RFM 13-15)
+- Customer count: 266
+- Segment churn rate: 58.65%
+- Model threshold used: 0.28
+- Action: VIP retention touchpoint only (early access + premium support), no blanket discount.
+- Cost mapping: $0 direct discount, $5 estimated service-touch cost per contacted customer.
+
+2) Potential Loyalist (RFM 10-12)
+- Customer count: 2750
+- Segment churn rate: 34.44%
+- Model threshold used: 0.28
+- Action: soft retention offer and loyalty nudges (bundle reminder, billing-plan optimization).
+- Cost mapping: $10 average incentive cost per contacted customer.
+
+3) At Risk (RFM 7-9)
+- Customer count: 2817
+- Segment churn rate: 25.59%
+- Model threshold used: 0.28
+- Action: primary churn campaign segment; targeted retention credit and call-back workflow.
+- Cost mapping: $20 retention offer cost per flagged customer (primary budget assumption).
+
+4) Lost (RFM 3-6)
+- Customer count: 1199
+- Segment churn rate: 3.75%
+- Model threshold used: 0.28
+- Action: low-cost automation only (email reactivation flow), no manual outreach.
+- Cost mapping: $2 automation cost per contacted customer.
+
+TOP CHURN DRIVERS (PLAIN-LANGUAGE, SHAP-ALIGNED)
+1) Customers in month-to-month contracts during their first year are the highest-risk group (early month-to-month cohort).
+2) Fiber internet customers without online security churn much more often than the base population.
+3) Customers paying by electronic check with paperless billing show a materially elevated churn pattern.
+4) Customers with high monthly bills and short tenure churn at a much higher rate than average.
+5) Contract structure remains a dominant signal: long-term contracts suppress churn risk, while month-to-month exposure increases it.
+
+BUDGET USE GUIDANCE
+- Use threshold 0.28 for production campaign targeting.
+- Use $20 as the baseline intervention cost for the At Risk targeting workflow.
+- Do not use the pure cost-optimized 0.11 threshold for production because precision drops too low.
