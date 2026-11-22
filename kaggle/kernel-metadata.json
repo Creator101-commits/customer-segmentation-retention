@@ -1,0 +1,17 @@
+{
+  "id": "sreeharshak101/customer-segmentation-retention-benchmark",
+  "title": "Customer Segmentation Retention Benchmark",
+  "code_file": "run_kaggle.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "false",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [
+    "sreeharshak101/customer-segmentation-retention-src",
+    "sreeharshak101/telco-churn-data"
+  ],
+  "competition_sources": [],
+  "kernel_sources": []
+}
