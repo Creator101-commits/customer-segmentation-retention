@@ -135,13 +135,15 @@ def main() -> None:
         grid[i, j] = row["churn_rate"]
         risk[i, j] = row["mean_predicted_risk"]
         counts[i, j] = row["n"]
-    im = ax.imshow(grid, cmap="YlOrRd", vmin=0.0, vmax=max(0.5, float(np.nanmax(grid))))
+    vmax = max(0.5, float(np.nanmax(grid)))
+    im = ax.imshow(grid, cmap="YlOrRd", vmin=0.0, vmax=vmax)
     for i in range(grid.shape[0]):
         for j in range(grid.shape[1]):
             ax.text(
                 j, i,
                 f"{grid[i, j]:.2f}\n({risk[i, j]:.2f})\nn={counts[i, j]}",
                 ha="center", va="center", fontsize=7,
+                color="white" if grid[i, j] > 0.6 * vmax else "black",
             )
     ax.set_xticks(range(len(charge_lv)))
     ax.set_xticklabels(charge_lv, fontsize=8)
@@ -160,7 +162,7 @@ def main() -> None:
     ax.set_title(f"SHAP importance ({sel}, test)")
     ax.grid(axis="x", alpha=0.3)
 
-    fig.tight_layout(rect=[0, 0, 1, 0.90])
+    fig.tight_layout(rect=[0, 0, 1, 0.92])
     fig.savefig(OUT, dpi=160)
 
     figure_data = {
