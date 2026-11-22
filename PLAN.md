@@ -2,8 +2,9 @@
 
 ## Status
 
-Rebuild in progress. The package, tests, CI, and Kaggle runner are in
-place; the CPU smoke and full runs have not completed yet.
+Complete. The Kaggle CPU benchmark ran on `b3c72b5` with
+`ordering_ok=true`; results are curated in `results/` and `image.png` is
+rendered from them.
 
 ## Stack
 
@@ -23,12 +24,14 @@ place; the CPU smoke and full runs have not completed yet.
 5. [x] Metrics, ECE, bootstrap CIs, segmentation, SHAP
 6. [x] Benchmark orchestration with frozen plan + ordering guard
 7. [x] Tests, CI, AGENTS.md, Kaggle smoke/full kernels
-8. [ ] Local checks green
-9. [ ] Kaggle CPU smoke run verified
-10. [ ] Kaggle CPU full run verified (git_sha + ordering_ok)
-11. [ ] Curate results/, render image.png, finalize README/REVIEW
+8. [x] Local checks green (17 tests, ruff, mypy strict)
+9. [x] Kaggle CPU smoke run verified (git_sha b3c72b5, ordering_ok)
+10. [x] Kaggle CPU full run verified (git_sha b3c72b5, ordering_ok,
+        100 trials, 2000 bootstrap)
+11. [x] Curate results/, render image.png, finalize README/REVIEW
 
 ## Open questions
 
-- Whether the pinned `blastchar/telco-customer-churn` CSV sha256 matches
-  the historically committed file (the runner verifies before upload).
+- None. The `blastchar/telco-customer-churn` CSV sha256 matched the
+  historically committed file (`88be4b93...61358a`); 11 blank
+  TotalCharges rows were imputed to 0 (all tenure=0).
