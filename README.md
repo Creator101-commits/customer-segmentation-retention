@@ -1,110 +1,106 @@
-# Customer Segmentation & Retention
-> End-to-end churn modeling and retention planning pipeline for the Telco customer dataset.
+# Customer Segmentation and Retention
 
-[![Python Version][python-image]][python-url]
-[![License: MIT][license-image]][license-url]
-[![Repo][repo-image]][repo-url]
+A reproducible churn-risk modeling and retention-segmentation study on the
+IBM Telco Customer Churn dataset (7,043 customers), with frozen
+train/validation/test discipline, calibrated probabilities, declared cost
+thresholds, and per-segment retention analysis.
 
-This project builds a full customer retention workflow using feature engineering, calibrated probabilities, threshold optimization, and business cost analysis. It produces model metrics, one-page summaries, recommendations, and charts that are directly usable for campaign planning.
+## Overview
 
-The current production recommendation uses a recall-constrained threshold to balance retention coverage with intervention efficiency.
+This repository rebuilds an earlier churn pipeline that selected models
+and thresholds on the test set and dropped rows with blank
+`TotalCharges`. The new protocol fixes those defects:
 
-## Installation
+- The Telco CSV is fetched by the Kaggle runner from
+  `blastchar/telco-customer-churn`, verified by sha256 against the pinned
+  digest `88be4b93...61358a`, and never committed.
+- Blank `TotalCharges` values are imputed to 0 (count recorded in the
+  data manifest) instead of dropping rows.
+- A stratified 60/20/20 train/validation/test split (seed 42) is fixed
+  before modeling.
+- All preprocessing lives in sklearn Pipelines fit on train only.
+- Optuna TPE tunes logistic regression, XGBoost, and LightGBM on train
+  with 5-fold stratified CV, ROC-AUC objective, 100 trials, seed 42.
+- Sigmoid vs isotonic calibration is chosen per model on validation by
+  log loss; the model is selected on validation by PR-AUC.
+- Two thresholds freeze on validation before the first test read: a
+  cost-optimal threshold under declared costs (FN 780, FP 20) and a
+  maximum-precision threshold subject to recall >= 0.80. A sensitivity
+  table covers FN/FP ratios {5, 10, 20, 39, 80}.
+- The frozen plan (with `card_write_epoch`) is persisted before the test
+  partition is touched; `manifest.json` records
+  `ordering_ok = card_write_epoch < first_test_read_epoch`.
+- Test metrics use 2,000 bootstrap resamples (seed 0): ROC-AUC, PR-AUC,
+  log loss, Brier, ECE (15 bins), and precision/recall/F1/expected cost
+  at both frozen thresholds.
+- Segmentation crosses tenure and MonthlyCharges tertiles (cut points
+  from train) and reports, per test segment: n, churn rate, mean
+  predicted risk, and flagged counts.
+- SHAP global importance on test explains the selected model; it is
+  explanatory only.
 
-OS X & Linux:
+Retention actions are recommendations under the stated cost assumptions,
+not measured savings.
 
-```sh
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install pandas numpy matplotlib scikit-learn xgboost shap optuna lightgbm
+## Data
+
+| Item | Value |
+| :--- | :--- |
+| Dataset | IBM Telco Customer Churn (`blastchar/telco-customer-churn` on Kaggle) |
+| Rows | 7,043 |
+| Target | `Churn` (binary) |
+| Features | 19 pre-treatment fields; `customerID` excluded |
+| Source SHA-256 | `88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a` |
+
+## Method
+
+```text
+load + sha256 verify -> impute TotalCharges blanks -> stratified 60/20/20
+-> per-learner: train-only pipeline + Optuna TPE (100 trials, 5-fold CV,
+   ROC-AUC) -> sigmoid/isotonic calibration chosen on validation by log
+   loss -> validation PR-AUC selects model -> freeze thresholds on
+   validation -> persist plan -> single test read -> metrics, bootstrap
+   CIs, segments, SHAP
 ```
 
-Windows (PowerShell):
+## Results
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install pandas numpy matplotlib scikit-learn xgboost shap optuna lightgbm
+Pending: the Kaggle CPU benchmark has not completed yet. Results will be
+curated unedited from the kernel output into `results/` after the run
+verifies `manifest.git_sha` and `ordering_ok`.
+
+## Findings
+
+Pending benchmark completion.
+
+## Provenance
+
+- Protocol: `churn-benchmark-v1`
+- Seed: 42 (split, tuning, calibration); bootstrap seed 0
+- Declared costs: FN 780, FP 20 (assumptions, not measured)
+- Kaggle kernel: `sreeharshak101/customer-segmentation-retention-benchmark`
+  (CPU), smoke kernel `...-smoke`
+- Source pinned by git SHA in `manifest.json`
+
+## Reproduction
+
+```bash
+uv sync
+uv run pytest
+uv run ruff check .
+uv run mypy src
 ```
 
-## Usage example
+Full benchmark (Kaggle CPU):
 
-Run the final optimization pipeline:
-
-```sh
-python model_search_ensemble.py
+```bash
+scripts/kaggle_run.sh          # versions src + data datasets, pushes, polls
+scripts/kaggle_run.sh --smoke  # reduced-trial diagnostic kernel first
 ```
 
-Generate charts from the latest saved report:
+Local diagnostic run (requires the CSV locally):
 
-```sh
-python generate_result_graphs.py
+```bash
+uv run churn benchmark --data Dataset/WA_Fn-UseC_-Telco-Customer-Churn.csv \
+    --out benchmark --trials 8 --boot 100 --smoke
 ```
-
-Open and run the notebook (optional interactive flow):
-
-```sh
-code telco_churn_runbook.ipynb
-```
-
-Key outputs:
-- `ensemble_optimization_report.json`
-- `recommendation.txt`
-- `RESULTS_ONE_PAGE.md`
-- `Results/results_metrics_comparison.png`
-- `Results/results_model_summary.png`
-- `Results/results_business_cost_breakdown.png`
-
-## Development setup
-
-Run the complete local workflow:
-
-```sh
-source .venv/bin/activate
-python PythonCode/model_search_ensemble.py
-python PythonCode/generate_result_graphs.py
-```
-
-Optional quick verification:
-
-```sh
-python -m py_compile model_search_ensemble.py generate_result_graphs.py
-```
-
-## Release History
-
-* 1.0.0
-    * ADD: Final calibrated XGBoost + LightGBM comparison pipeline
-    * ADD: Business-cost and recall-constrained threshold reporting
-    * ADD: One-page result summary and recommendation deliverables
-* 0.9.0
-    * ADD: Feature engineering, calibration, and Optuna tuning workflow
-    * ADD: Result chart generation scripts
-* 0.1.0
-    * Initial project scaffold and baseline churn modeling
-
-## Meta
-
-Maintainer: Creator101-commits
-
-Distributed under the MIT license. See `LICENSE` for more information.
-
-[https://github.com/Creator101-commits/customer-segmentation-retention](https://github.com/Creator101-commits/customer-segmentation-retention)
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/your-change`)
-3. Commit your changes (`git commit -m "Describe your change"`)
-4. Push to the branch (`git push origin feature/your-change`)
-5. Open a Pull Request
-
-<!-- Markdown link & img dfn's -->
-[python-image]: https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square
-[python-url]: https://www.python.org/
-[license-image]: https://img.shields.io/badge/license-MIT-green?style=flat-square
-[license-url]: https://opensource.org/licenses/MIT
-[repo-image]: https://img.shields.io/badge/repo-GitHub-black?style=flat-square
-[repo-url]: https://github.com/Creator101-commits/customer-segmentation-retention
