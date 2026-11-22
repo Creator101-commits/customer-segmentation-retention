@@ -1,0 +1,71 @@
+{
+  "git_sha": "b3c72b546fb6ad979e46cbc349b9e3c43e3c6dc5",
+  "protocol": "churn-benchmark-v1",
+  "generated_at": "2026-11-22T02:26:06Z",
+  "card_write_epoch": 1795314327.3612537,
+  "first_test_read_epoch": 1795314327.361624,
+  "ordering_ok": true,
+  "data": {
+    "source": "kaggle blastchar/telco-customer-churn",
+    "source_csv_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+    "n_rows": 7043,
+    "n_features": 19,
+    "target": "Churn",
+    "target_positive_rate": 0.2653698707936959,
+    "total_charges_blanks_imputed_to_zero": 11,
+    "blanks_with_zero_tenure": 11,
+    "split": {
+      "scheme": "stratified 60/20/20",
+      "seed": 42,
+      "train": 4225,
+      "validation": 1409,
+      "test": 1409,
+      "train_churn_rate": 0.26532544378698225,
+      "val_churn_rate": 0.2654364797728886,
+      "test_churn_rate": 0.2654364797728886
+    },
+    "numeric_features": [
+      "tenure",
+      "MonthlyCharges",
+      "TotalCharges",
+      "SeniorCitizen"
+    ],
+    "categorical_features": [
+      "gender",
+      "Partner",
+      "Dependents",
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies",
+      "Contract",
+      "PaperlessBilling",
+      "PaymentMethod"
+    ],
+    "path": "/kaggle/input/datasets/sreeharshak101/telco-churn-data/WA_Fn-UseC_-Telco-Customer-Churn.csv"
+  },
+  "config": {
+    "n_trials": 100,
+    "n_bootstrap": 2000,
+    "bootstrap_seed": 0,
+    "seed": 42,
+    "cost_fn": 780.0,
+    "cost_fp": 20.0,
+    "min_recall": 0.8,
+    "ece_bins": 15,
+    "smoke": false
+  },
+  "artifacts": [
+    "analysis_plan.json",
+    "metrics.json",
+    "manifest.json",
+    "report.md",
+    "segments.csv",
+    "shap_importance.csv"
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "protocol": "churn-benchmark-v1",
+  "seed": 42,
+  "n_trials": 100,
+  "n_bootstrap": 2000,
+  "costs": {
+    "cost_fn": 780.0,
+    "cost_fp": 20.0,
+    "min_recall": 0.8,
+    "note": "declared assumptions, not measured costs"
+  },
+  "split": "stratified 60/20/20",
+  "learners": [
+    "lightgbm",
+    "logistic",
+    "majority",
+    "xgboost"
+  ],
+  "selected_model": "xgboost",
+  "selection_rule": "validation PR-AUC",
+  "val_pr_auc": {
+    "majority": 0.2654364797728886,
+    "logistic": 0.6383630083936876,
+    "xgboost": 0.6455329108398884,
+    "lightgbm": 0.6378282110669151
+  },
+  "frozen_test_thresholds": {
+    "majority": {
+      "cost_optimal": 0.0,
+      "max_precision_recall_0.80": 0.0
+    },
+    "logistic": {
+      "cost_optimal": 0.034482758620689655,
+      "max_precision_recall_0.80": 0.265243390243391
+    },
+    "xgboost": {
+      "cost_optimal": 0.024284865804113702,
+      "max_precision_recall_0.80": 0.21487602591514587
+    },
+    "lightgbm": {
+      "cost_optimal": 0.10112359550561797,
+      "max_precision_recall_0.80": 0.21779939310803592
+    }
+  },
+  "calibration": {
+    "majority": null,
+    "logistic": "isotonic",
+    "xgboost": "isotonic",
+    "lightgbm": "isotonic"
+  },
+  "val_logloss_by_method": {
+    "majority": {},
+    "logistic": {
+      "sigmoid": 0.42838157408959243,
+      "isotonic": 0.41534059487382574
+    },
+    "xgboost": {
+      "sigmoid": 0.42300589315478265,
+      "isotonic": 0.41148914201076436
+    },
+    "lightgbm": {
+      "sigmoid": 0.4264806831950453,
+      "isotonic": 0.41353035954966644
+    }
+  },
+  "tuned_params": {
+    "majority": {},
+    "logistic": {
+      "C": 97.85944109120214
+    },
+    "xgboost": {
+      "max_depth": 3,
+      "learning_rate": 0.015419162353371903,
+      "n_estimators": 269,
+      "subsample": 0.7234302971282686,
+      "colsample_bytree": 0.6617713541330463,
+      "min_child_weight": 2.139659349981072,
+      "reg_lambda": 6.284362841096885
+    },
+    "lightgbm": {
+      "num_leaves": 15,
+      "learning_rate": 0.013732800180260948,
+      "n_estimators": 152,
+      "subsample": 0.7084885940357922,
+      "colsample_bytree": 0.6406064801027779,
+      "min_child_samples": 33,
+      "reg_lambda": 3.371280100285326
+    }
+  },
+  "smoke": false
+}
