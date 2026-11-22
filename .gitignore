@@ -1,19 +1,24 @@
-# Python cache and build artifacts
+# Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-
-# Virtual environments
+*.egg-info/
 .venv/
-venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# Jupyter
-.ipynb_checkpoints/
+# Data: the Telco CSV is sha256-pinned and fetched by the Kaggle runner.
+Dataset/WA_Fn-UseC_-Telco-Customer-Churn.csv
+*.csv
+!results/*.csv
 
-# macOS
-.DS_Store
+# Outputs and artifacts
+artifacts/
+benchmark/
+results/*.parquet
+*.parquet
 
-# Generated artifacts
-catboost_info/
-prob_distribution.png
+# Kaggle
+kaggle/dataset-metadata.json
+
+.coverage
