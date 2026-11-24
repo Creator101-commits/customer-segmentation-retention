@@ -328,6 +328,17 @@ def check_legend_pixels(fig: plt.Figure, path: Path) -> list[str]:
     rgb = img[..., :3]
     spread = rgb.max(axis=2) - rgb.min(axis=2)
     colored = spread > 0.18
+    def _collect(o: object, swatches: list) -> None:
+        if type(o).__name__ == "DrawingArea":
+            swatches.append(o)
+            return
+        try:
+            children = o.get_visible_children()
+        except Exception:
+            children = []
+        for c in children:
+            _collect(c, swatches)
+
     out = []
     for ax in fig.axes:
         leg = ax.get_legend()
@@ -342,22 +353,10 @@ def check_legend_pixels(fig: plt.Figure, path: Path) -> list[str]:
         # mask every legend handle swatch (any column) so only data-colored
         # bleed through the legend body counts; swatches live in
         # DrawingArea children of the legend's offset box
-        swatches = []
-
-        def _collect(o):
-            if type(o).__name__ == "DrawingArea":
-                swatches.append(o)
-                return
-            try:
-                children = o.get_visible_children()
-            except Exception:
-                children = []
-            for c in children:
-                _collect(c)
-
+        swatches: list = []
         box = getattr(leg, "_legend_handle_box", None)
         if box is not None:
-            _collect(box)
+            _collect(box, swatches)
         for sw in swatches:
             try:
                 hb = sw.get_window_extent(fig.canvas.get_renderer())
