@@ -23,8 +23,8 @@
   `b3c72b5`, `ordering_ok=true`, 100 trials / 2000 bootstrap,
   `smoke=false`, artifacts in `artifacts/kaggle/20261121-201615/`.
 - Curation: all six `results/` files verified byte-identical (`cmp`)
-  against the kernel output; `image.png` + `scripts/figure-data.json`
-  rendered from `results/` only.
+  against the kernel output; `image.png` rendered from `results/` only
+  by `scripts/render_figure.py` (portfolio v2 style, hard layout checks).
 
 ## Residual notes
 

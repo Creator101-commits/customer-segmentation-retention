@@ -70,6 +70,31 @@ Kaggle CPU benchmark `churn-benchmark-v1` completed on git SHA
 (`card_write_epoch < first_test_read_epoch`). Curated outputs live in
 `results/` (unedited kernel copies); `image.png` is rendered from them.
 
+![Churn benchmark results: discrimination, frozen thresholds, segment calibration, segment grid and SHAP importance](image.png)
+
+### What the figure shows
+
+- (a) Test discrimination: all three tuned learners reach ROC-AUC about
+  0.84-0.85 with overlapping 95% bootstrap CIs, while the majority
+  baseline sits at 0.500; xgboost is selected on validation PR-AUC
+  (0.6455) and reaches 0.637 PR-AUC [0.589, 0.686] on test.
+- (b) Frozen thresholds: the cost-optimal cutoff (0.0243) flags nearly
+  every churner (recall 0.995) at precision 0.310; the
+  max-precision-at-recall-0.80 cutoff (0.2149) lifts precision to 0.472
+  while keeping recall 0.845.
+- (c) Calibration by segment: observed churn rate tracks mean predicted
+  risk across all nine tenure x charge segments, with marker area
+  proportional to segment size.
+- (d) Segment grid: test churn rate spans 0.015 (`high__low`, n=135) to
+  0.679 (`low__high`, n=81), and each cell annotates mean predicted
+  risk and count.
+- (e) SHAP importance: Contract dominates mean |SHAP| (0.789), followed
+  by tenure (0.324) and MonthlyCharges (0.233); explanatory only.
+
+The frozen xgboost model reaches 0.847 ROC-AUC and 0.637 PR-AUC on the
+held-out test set, with predicted risk tracking observed churn in every
+segment.
+
 Frozen configuration: 100 Optuna TPE trials per learner, 5-fold stratified
 CV on train, ROC-AUC objective, seed 42; sigmoid vs isotonic calibration
 by validation log loss; model selection by validation PR-AUC; 2,000
