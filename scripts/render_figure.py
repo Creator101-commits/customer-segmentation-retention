@@ -22,6 +22,8 @@ import matplotlib.pyplot as plt  # noqa: E402
 import matplotlib.ticker as mticker  # noqa: E402
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
+from matplotlib.collections import PathCollection  # noqa: E402
+from matplotlib.colors import LinearSegmentedColormap  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 RESULTS = Path(os.environ.get("CHURN_RESULTS_DIR", ROOT / "results"))
@@ -36,6 +38,9 @@ GRAY = "#9AA5B1"
 GRID = "#EEF0F2"
 SPINE = "#B8BEC6"
 TICK_LABEL = "#4A5361"
+SEQUENTIAL = LinearSegmentedColormap.from_list(
+    "seq", ["#FFFFFF", BLUE, INK]
+)
 
 plt.rcParams.update(
     {
@@ -176,6 +181,8 @@ def verify_categories() -> None:
 def _all_texts(fig: plt.Figure) -> list[plt.Text]:
     items = []
     for ax in fig.axes:
+        if not ax.axison:
+            continue
         cand = [ax.title, ax.xaxis.label, ax.yaxis.label]
         cand += list(ax.texts)
         for axis in (ax.xaxis, ax.yaxis):
@@ -377,6 +384,175 @@ def check_legend_pixels(fig: plt.Figure, path: Path) -> list[str]:
     return out
 
 
+
+def check_empty_axes(fig: plt.Figure) -> list[str]:
+    """Every axes must contain at least one plotted artist."""
+    fig.canvas.draw()
+    fig.canvas.draw()
+    out = []
+    for i, ax in enumerate(fig.axes):
+        if not ax.axison:
+            continue
+        artists = (len(ax.lines) + len(ax.collections)
+                   + len(ax.patches) + len(ax.images))
+        if artists == 0:
+            out.append(f"axes {i} has no plotted artists")
+    return out
+
+
+def check_offscale(fig: plt.Figure) -> list[str]:
+    """Every data point must lie inside its axes limits."""
+    fig.canvas.draw()
+    fig.canvas.draw()
+    out = []
+    eps = 1e-9
+    for i, ax in enumerate(fig.axes):
+        x0, x1 = ax.get_xlim()
+        y0, y1 = ax.get_ylim()
+        for coll in ax.collections:
+            if (coll.get_offset_transform() != ax.transData
+                    or not isinstance(coll, PathCollection)):
+                continue
+            offs = coll.get_offsets()
+            if len(offs) == 0 or len(offs) > 20000:
+                continue
+            xs, ys = offs[:, 0], offs[:, 1]
+            bad = int(
+                ((xs < x0 - eps) | (xs > x1 + eps)
+                 | (ys < y0 - eps) | (ys > y1 + eps)).sum()
+            )
+            if bad:
+                out.append(
+                    f"axes {i}: {bad} collection points outside limits"
+                )
+        for line in ax.lines:
+            if line.get_transform() != ax.transData:
+                continue
+            try:
+                pts = line.get_path().vertices
+            except Exception:
+                continue
+            if len(pts) == 0:
+                continue
+            xs, ys = pts[:, 0], pts[:, 1]
+            bad = int(
+                ((xs < x0 - eps) | (xs > x1 + eps)
+                 | (ys < y0 - eps) | (ys > y1 + eps)).sum()
+            )
+            if bad:
+                out.append(
+                    f"axes {i}: {bad} line vertices outside limits"
+                )
+        ren = fig.canvas.get_renderer()
+        bb = ax.get_window_extent(ren)
+        clipped = 0
+        for patch in ax.patches:
+            try:
+                pb = patch.get_window_extent(ren)
+            except Exception:
+                continue
+            if (pb.x0 < bb.x0 - 1 or pb.x1 > bb.x1 + 1
+                    or pb.y0 < bb.y0 - 1 or pb.y1 > bb.y1 + 1):
+                clipped += 1
+        if clipped:
+            out.append(f"axes {i}: {clipped} patches past axes bounds")
+    return out
+
+
+def check_clipped_markers(fig: plt.Figure) -> list[str]:
+    """No marker may extend past the axes bounds."""
+    fig.canvas.draw()
+    fig.canvas.draw()
+    ren = fig.canvas.get_renderer()
+    out = []
+    for i, ax in enumerate(fig.axes):
+        bb = ax.get_window_extent(ren)
+        px_per_pt = fig.dpi / 72.0
+        flagged = False
+        for coll in ax.collections:
+            if (coll.get_offset_transform() != ax.transData or flagged
+                    or not isinstance(coll, PathCollection)):
+                continue
+            offs = coll.get_offsets()
+            if len(offs) == 0:
+                continue
+            try:
+                sizes = np.asarray(coll.get_sizes(), dtype=float)
+            except Exception:
+                sizes = np.array([])
+            if len(sizes) == len(offs) and len(sizes):
+                radii_px = np.sqrt(sizes) / 2.0 * px_per_pt
+            elif len(sizes):
+                radii_px = np.full(
+                    len(offs), np.sqrt(sizes.max()) / 2.0 * px_per_pt
+                )
+            else:
+                radii_px = np.full(len(offs), 3.0 * px_per_pt)
+            pts = ax.transData.transform(offs)
+            hit = (
+                (pts[:, 0] - radii_px < bb.x0)
+                | (pts[:, 0] + radii_px > bb.x1)
+                | (pts[:, 1] - radii_px < bb.y0)
+                | (pts[:, 1] + radii_px > bb.y1)
+            ).any()
+            if hit:
+                out.append(f"axes {i}: marker extends past axes bounds")
+                flagged = True
+        for line in ax.lines:
+            if flagged:
+                break
+            if line.get_transform() != ax.transData:
+                continue
+            marker = line.get_marker()
+            if marker in (None, "", " ", "None", "none", "|", "_"):
+                continue
+            ms = line.get_markersize()
+            radius_px = (ms / 2.0) * px_per_pt
+            pts = ax.transData.transform(line.get_path().vertices)
+            if len(pts) == 0:
+                continue
+            hit = (
+                (pts[:, 0] - radius_px < bb.x0)
+                | (pts[:, 0] + radius_px > bb.x1)
+                | (pts[:, 1] - radius_px < bb.y0)
+                | (pts[:, 1] + radius_px > bb.y1)
+            ).any()
+            if hit:
+                out.append(f"axes {i}: marker extends past axes bounds")
+                flagged = True
+    return out
+
+
+def check_coincident_lines(fig: plt.Figure) -> list[str]:
+    """No two line series may be fully coincident."""
+    fig.canvas.draw()
+    fig.canvas.draw()
+    out = []
+    for i, ax in enumerate(fig.axes):
+        lines = [
+            ln for ln in ax.lines
+            if ln.get_transform() == ax.transData
+        ]
+        seen = False
+        for a in range(len(lines)):
+            if seen:
+                break
+            for b in range(a + 1, len(lines)):
+                pa = lines[a].get_path().vertices
+                pb = lines[b].get_path().vertices
+                if len(pa) != len(pb) or len(pa) == 0:
+                    continue
+                if np.allclose(pa, pb, atol=1e-6, equal_nan=True):
+                    out.append(
+                        f"axes {i}: coincident line series "
+                        f"({lines[a].get_label()!r}, "
+                        f"{lines[b].get_label()!r})"
+                    )
+                    seen = True
+                    break
+    return out
+
+
 def finish(fig: plt.Figure, out: Path) -> None:
     """Verify categorical labels, save, then fail on any check violation."""
     fig.canvas.draw()
@@ -388,6 +564,10 @@ def finish(fig: plt.Figure, out: Path) -> None:
     problems += check_legend_data(fig)
     problems += check_annotation_data(fig)
     problems += check_legend_pixels(fig, out)
+    problems += check_empty_axes(fig)
+    problems += check_offscale(fig)
+    problems += check_clipped_markers(fig)
+    problems += check_coincident_lines(fig)
     plt.close(fig)
     if problems:
         for p in problems[:30]:
@@ -404,7 +584,8 @@ def main() -> None:
     names = [n for n in ORDER if n in metrics["models"]]
 
     fig, axes = plt.subplots(2, 3, figsize=(13.9, 6.3), dpi=DPI, layout="constrained")
-    (a1, a2, a3), (a4, a5, _a6) = axes
+    (a1, a2, a3), (a4, a5, a6) = axes
+    a6.set_axis_off()
 
     # (a) Test discrimination per learner with bootstrap CIs.
     x = np.arange(len(names))
@@ -473,8 +654,8 @@ def main() -> None:
     )
     lim = max(0.55, float(max(risks.max(), churn.max())) * 1.08)
     a3.plot([0, lim], [0, lim], color=GRAY, lw=1.0, ls="--", zorder=2)
-    a3.set_xlim(0, lim)
-    a3.set_ylim(0, lim)
+    a3.set_xlim(-0.05, lim)
+    a3.set_ylim(-0.05, lim)
     a3.set_xlabel("mean predicted risk")
     a3.set_ylabel("observed churn rate")
     style(a3, "c", "Calibration by segment (area $\\propto$ n)", grid=False)
@@ -502,7 +683,7 @@ def main() -> None:
         risk[i, j] = row["mean_predicted_risk"]
         counts_g[i, j] = row["n"]
     vmax = max(0.5, float(np.nanmax(grid)))
-    im = a4.imshow(grid, cmap="YlOrRd", vmin=0.0, vmax=vmax)
+    im = a4.imshow(grid, cmap=SEQUENTIAL, vmin=0.0, vmax=vmax)
     for i in range(grid.shape[0]):
         for j in range(grid.shape[1]):
             a4.text(
