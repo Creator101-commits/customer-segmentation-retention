@@ -103,8 +103,7 @@ def max_precision_threshold(
                 (m["precision"], m["recall"], -float(thr), float(thr))
             )
     if not candidates:
-        # No threshold reaches the recall floor; fall back to the
-        # threshold with the highest recall and record that honestly.
+        # No threshold reaches the floor; keep the highest-recall one.
         recalls = [
             (_metrics_at(y, probs, float(t))["recall"], float(t)) for t in grid
         ]

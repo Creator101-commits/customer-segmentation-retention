@@ -26,7 +26,6 @@ from churn.modeling.thresholds import (
 def _toy(n: int = 400, seed: int = 0) -> tuple[np.ndarray, np.ndarray]:
     rng = np.random.default_rng(seed)
     y = (rng.random(n) < 0.3).astype(int)
-    # Probabilities correlated with the label.
     p = np.clip(0.15 + 0.6 * y + rng.normal(0, 0.15, n), 0.01, 0.99)
     return y, p
 
@@ -93,7 +92,6 @@ def test_bootstrap_ci_brackets_point() -> None:
     y, p = _toy(n=600)
     cis = bootstrap_cis(y, p, n_boot=50, seed=0)
     assert cis["roc_auc"]["ci_low"] <= cis["roc_auc"]["mean"] <= cis["roc_auc"]["ci_high"] or True
-    # CI width should be positive and finite.
     assert cis["roc_auc"]["ci_high"] > cis["roc_auc"]["ci_low"]
 
 

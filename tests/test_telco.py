@@ -80,7 +80,6 @@ def test_split_sizes_and_stratification() -> None:
     assert len(train) == 1200 and len(val) == 400 and len(test) == 400
     for idx in (train, val, test):
         assert abs(y[idx].mean() - y.mean()) < 0.02
-    # Deterministic.
     train2, val2, test2 = stratified_split(y)
     np.testing.assert_array_equal(train, train2)
 
