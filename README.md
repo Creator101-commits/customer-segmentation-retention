@@ -1,6 +1,6 @@
 # Customer Segmentation and Retention
 
-> Churn risk for 7,043 telecom customers: ROC-AUC 0.85, calibrated risk scores, and nine retention segments.
+> Telecom churn prediction
 
 Which telecom customers are about to leave, and which of them are worth
 calling? This project ranks 7,043 IBM Telco customers by churn risk, turns
@@ -38,12 +38,13 @@ concentrates, (e) which fields drive the predictions.
   0.015 (n=135). That spread is what makes segmentation useful.
 - **Contract type dominates.** Mean |SHAP| ranks Contract (0.789) ahead of
   tenure (0.324) and MonthlyCharges (0.233), which matches the segment
-  pattern.
+  pattern; the importances are explanatory, not causal.
 - **The cost-optimal policy is barely a policy.** Under the declared costs
   a missed churner is worth 39 wasted calls, so the cut-off collapses to
   0.0243 and flags nearly everyone: recall 0.995 at precision 0.310. The
   recall-constrained cut-off (0.2149) is the usable one, with precision
-  0.472 at recall 0.845.
+  0.472 at recall 0.845. The costs are declared assumptions, so these are
+  policy comparisons rather than measured savings.
 
 | Frozen threshold | Cut-off | Precision | Recall | F1 |
 | :--- | ---: | ---: | ---: | ---: |
@@ -80,13 +81,3 @@ verifies its checksum:
 scripts/kaggle_run.sh           # full run
 scripts/kaggle_run.sh --smoke   # reduced-trial check first
 ```
-
-## Notes
-
-- Retention costs (FN 780, FP 20) are declared assumptions, so the
-  expected costs are policy comparisons, not measured savings.
-- SHAP importances explain the model, not causes of churn.
-- Data: IBM Telco Customer Churn (`blastchar/telco-customer-churn`), 7,043
-  rows, 19 pre-treatment features, pinned by SHA-256 and never committed.
-- Protocol `churn-benchmark-v1`, seed 42, bootstrap seed 0. Curated kernel
-  output is in `results/`, and `image.png` is rendered from it.
