@@ -1,5 +1,7 @@
 # Customer Segmentation and Retention
 
+> Churn risk for 7,043 telecom customers: ROC-AUC 0.85, calibrated risk scores, and nine retention segments.
+
 Which telecom customers are about to leave, and which of them are worth
 calling? This project ranks 7,043 IBM Telco customers by churn risk, turns
 those scores into two concrete flagging policies, and checks whether the
